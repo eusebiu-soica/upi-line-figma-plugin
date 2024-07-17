@@ -16,3 +16,5 @@ This Figma plugin allows users to quickly export their selections as SVG files. 
 3. **Download**: Click the "Download SVG" button to download the SVG file.
 
 ## Figma Community
+
+https://www.figma.com/community/plugin/1394949439792837336/upi-line-svg-downloader
