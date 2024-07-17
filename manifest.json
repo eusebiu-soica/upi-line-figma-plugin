@@ -1,0 +1,26 @@
+{
+  "name": "Upi Line - SVG Downloader",
+  "id": "1394949439792837336",
+  "api": "1.0.0",
+  "main": "code.js",
+  "capabilities": [],
+  "enableProposedApi": false,
+  "documentAccess": "dynamic-page",
+  "editorType": [
+    "figma"
+  ],
+  "ui": "ui.html",
+  "networkAccess": {
+    "allowedDomains": [
+      "https://cdnjs.cloudflare.com",
+      "https://cdn.jsdelivr.net",
+      "https://fonts.googleapis.com",
+      "https://fonts.gstatic.com",
+      "https://www.w3schools.com",
+      "https://www.freepik.com/",
+      "https://buttons.github.io",
+      "https://api.github.com",
+      "https://cdn-icons-png.flaticon.com"
+    ]
+  }
+}
