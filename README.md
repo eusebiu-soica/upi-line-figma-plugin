@@ -1,4 +1,4 @@
-# Figma SVG Export Plugin
+# Upi Line - SVG Downloader - Figma SVG Export Plugin
 
 ## Description
 
@@ -14,3 +14,5 @@ This Figma plugin allows users to quickly export their selections as SVG files. 
 1. **Select an Element**: Select an element in Figma to export as SVG.
 2. **Preview**: A preview of the generated SVG will be displayed in the plugin.
 3. **Download**: Click the "Download SVG" button to download the SVG file.
+
+## Figma Community
