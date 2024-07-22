@@ -510,6 +510,11 @@
               );
             };
           }
+
+          if (type === "loading") {
+            const preview = document.querySelector("#preview");
+            preview.innerHTML = '<span class="loader"></span>';
+          }
         } catch (error) {
           console.log("Error handling message:", error);
         }

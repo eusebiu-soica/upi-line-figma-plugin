@@ -1,80 +1,73 @@
-// This shows the HTML page in "ui.html".
 import * as JSZip from "jszip";
 figma.showUI(__html__, { width: 450, height: 560 });
 
-figma.on("selectionchange", async () => {
-  const selection = figma.currentPage.selection;
-  console.log(selection);
+function uint8ArrayToString(uintArray: Uint8Array): string {
+  let decodedString = "";
+  for (let i = 0; i < uintArray.length; i++) {
+    decodedString += String.fromCharCode(uintArray[i]);
+  }
+  return decodedString;
+}
 
-  if (selection.length === 1) {
-    const node = selection[0];
+async function processSingleNode(node: any) {
+  try {
+    console.log(node.type)
+    if (!node.type) return;
+    const svg = await node.exportAsync({ format: "SVG" });
+    const svgString = uint8ArrayToString(svg);
+    const svgStringFormatted = `<!----- ${node.name} ----->\n${svgString}`;
+
     figma.ui.postMessage({
-      type: "loading",
+      type: "display-svg",
+      svg: svgStringFormatted,
+      name: node.name,
     });
+  } catch (error) {
+    console.error("Error exporting SVG:", error);
+  }
+}
 
-    if (node.type) {
+async function processMultipleNodes(nodes: any) {
+  let concatStr = "";
+  const zip = new JSZip();
+
+  for (const nodeElement of nodes) {
+    if (nodeElement.type) {
       try {
-        const svg = await node.exportAsync({ format: "SVG" });
-
-        function uint8ArrayToString(uintArray: Uint8Array): string {
-          let decodedString = "";
-          for (let i = 0; i < uintArray.length; i++) {
-            decodedString += String.fromCharCode(uintArray[i]);
-          }
-          return decodedString;
-        }
-
+        const svg = await nodeElement.exportAsync({ format: "SVG" });
         const svgString = uint8ArrayToString(svg);
-        const svgStringFormatted = "<!----- "+ node.name + " ----->" + "\n"+ svgString
+        concatStr += `<!----- ${nodeElement.name} ----->\n${svgString}\n`;
 
-        figma.ui.postMessage({
-          type: "display-svg",
-          svg: svgStringFormatted,
-          name: node.name,
-        });
+        zip.file(`${nodeElement.name}.svg`, svgString);
       } catch (error) {
         console.error("Error exporting SVG:", error);
       }
     }
-  } else if (selection.length > 1) {
-    const nodes = selection;
-    let concatStr = "";
-    
-    const zip = new JSZip();
-    async function processNodes(nodes: any) {
-      for (const nodeElement of nodes) {
-        if (nodeElement.type) {
-          try {
-            const svg = await nodeElement.exportAsync({ format: "SVG" });
-
-            function uint8ArrayToString(uintArray: Uint8Array): string {
-              let decodedString = "";
-              for (let i = 0; i < uintArray.length; i++) {
-                decodedString += String.fromCharCode(uintArray[i]);
-              }
-              return decodedString;
-            }
-
-            const svgString = uint8ArrayToString(svg);
-            concatStr += "<!----- "+ nodeElement.name + " ----->" + "\n"+ svgString + "\n";
-
-            zip.file(nodeElement.name + ".svg", svgString);
-            const zipContent = await zip.generateAsync({ type: "uint8array" });
-            figma.ui.postMessage({
-              type: "display-svg",
-              svg: concatStr,
-              isMultipleSelect: true,
-              zip: zipContent
-            });
-          } catch (error) {
-            console.error("Error exporting archive:", error);
-          }
-        }
-      }
-    }
-
-    await processNodes(nodes);
-  } else {
-    figma.showUI(__html__, { width: 450, height: 560 });
   }
+
+  const zipContent = await zip.generateAsync({ type: "uint8array" });
+
+  figma.ui.postMessage({
+    type: "display-svg",
+    svg: concatStr,
+    isMultipleSelect: true,
+    zip: zipContent,
+  });
+}
+
+figma.on("selectionchange", () => {
+  figma.ui.postMessage({
+    type: "loading",
+  });
+  const selection = figma.currentPage.selection;
+  console.log(selection)
+  setTimeout(async () => {
+    if (selection.length === 1) {
+      await processSingleNode(selection[0]);
+    } else if (selection.length > 1) {
+      await processMultipleNodes(selection);
+    } else {
+      figma.showUI(__html__, { width: 450, height: 560 });
+    }
+  }, 100);
 });
