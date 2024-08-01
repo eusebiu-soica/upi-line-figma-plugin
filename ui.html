@@ -488,7 +488,7 @@
       downloadBtn.setAttribute("disabled", "true");
       window.onmessage = async (event) => {
         try {
-          const { type, svg, name, isMultipleSelect, zip } =
+          const { type, svg, name, isMultipleSelect, svgConcat, zip } =
             event.data.pluginMessage;
           if (type === "display-svg") {
             const preview = document.getElementById("preview");
@@ -496,7 +496,7 @@
 
             isMultipleSelect ? downloadBtn.innerHTML = 'Download ZIP' : downloadBtn.innerHTML = 'Download SVG'
 
-            window.editor.setValue(svg);
+            window.editor.setValue(isMultipleSelect ? svg : svgConcat);
             preview.innerHTML = svg;
             preview.classList.add("white");
 

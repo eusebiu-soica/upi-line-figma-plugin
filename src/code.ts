@@ -11,7 +11,6 @@ function uint8ArrayToString(uintArray: Uint8Array): string {
 
 async function processSingleNode(node: any) {
   try {
-    console.log(node.type)
     if (!node.type) return;
     const svg = await node.exportAsync({ format: "SVG" });
     const svgString = uint8ArrayToString(svg);
@@ -19,11 +18,13 @@ async function processSingleNode(node: any) {
 
     figma.ui.postMessage({
       type: "display-svg",
-      svg: svgStringFormatted,
+      svg: svgString,
+      svgConcat: svgStringFormatted,
       name: node.name,
+      isMultipleSelect: false
     });
   } catch (error) {
-    console.error("Error exporting SVG:", error);
+    console.log("Error exporting SVG:", error);
   }
 }
 
@@ -40,7 +41,7 @@ async function processMultipleNodes(nodes: any) {
 
         zip.file(`${nodeElement.name}.svg`, svgString);
       } catch (error) {
-        console.error("Error exporting SVG:", error);
+        console.log("Error exporting SVG:", error);
       }
     }
   }
@@ -60,7 +61,6 @@ figma.on("selectionchange", () => {
     type: "loading",
   });
   const selection = figma.currentPage.selection;
-  console.log(selection)
   setTimeout(async () => {
     if (selection.length === 1) {
       await processSingleNode(selection[0]);
